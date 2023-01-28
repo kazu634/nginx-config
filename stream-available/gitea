@@ -1,0 +1,13 @@
+proxy_protocol on;
+error_log /var/log/nginx/stream.log info;
+
+upstream gitea-backend {
+
+  server 127.0.0.1:60000;
+
+}
+
+server {
+  listen       0.0.0.0:50022;
+  proxy_pass   gitea-backend;
+}

@@ -1,9 +1,10 @@
 server {
+  # allow access from localhost
   listen 443 ssl http2;
-  server_name minio.kazu634.com;
+  server_name staging.everun.club;
 
-  ssl_certificate /etc/lego/.lego/certificates/_.kazu634.com.crt;
-  ssl_certificate_key /etc/lego/.lego/certificates/_.kazu634.com.key;
+  ssl_certificate /etc/lego/.lego/certificates/_.everun.club.crt;
+  ssl_certificate_key /etc/lego/.lego/certificates/_.everun.club.key;
   ssl_dhparam /etc/lego/dhparams_4096.pem;
 
   ssl_session_timeout 1d;
@@ -23,20 +24,22 @@ server {
   # Enable HSTS (HTTP Strict Transport Security)
   add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
-  access_log   /var/log/nginx/minio.access.log   ltsv;
-  error_log    /var/log/nginx/minio.error.log;
+  root /var/www/test-everun;
+  index index.html index.htm;
 
-  proxy_buffering off;
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-Host $host;
-  proxy_set_header X-Forwarded-Server $host;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  access_log   /var/log/nginx/stag-everun.access.log   ltsv;
+  error_log    /var/log/nginx/stag-everun.error.log;
 
-  ignore_invalid_headers off;
-  client_max_body_size 0;
+  http2_max_field_size 256k;
+  http2_max_header_size 256k;
+
+  # To allow POST on static pages
+  error_page  405     =200 $uri;
 
   location / {
-    proxy_pass http://192.168.10.200:9000/;
+    auth_basic "限定公開中なのでユーザー名とパスワードを入れてください";
+    auth_basic_user_file "/etc/nginx/basic-auth";
+
+    try_files $uri $uri/ /index.html;
   }
 }
