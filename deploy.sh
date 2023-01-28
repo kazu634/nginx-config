@@ -9,7 +9,7 @@ for CONF in `find ${CUR}/sites-available/ -type f` ; do
 done
 
 for CONF in `find ${CUR}/stream-available/ -type f` ; do
-  ln -f -s ${CONF} /etc/nginx/sites-enabled/
+  ln -f -s ${CONF} /etc/nginx/stream-enabled/
 done
 
 for CONF in `find ${CUR}/consul-template.d/conf/ -type f -name "*.conf"` ; do
