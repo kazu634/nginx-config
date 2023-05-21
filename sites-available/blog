@@ -28,7 +28,7 @@ server {
   root /var/www/blog;
   index index.html index.htm;
 
-  access_log   /var/log/nginx/blog.access.log   ltsv;
+  access_log   /var/log/nginx/blog.access.log   json;
   error_log    /var/log/nginx/blog.error.log;
 
   location / {

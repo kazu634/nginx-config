@@ -23,7 +23,7 @@ server {
   # Enable HSTS (HTTP Strict Transport Security)
   add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
-  access_log   /var/log/nginx/grafana.access.log   ltsv;
+  access_log   /var/log/nginx/grafana.access.log   json;
   error_log    /var/log/nginx/grafana.error.log;
 
   proxy_set_header Host $host;
