@@ -27,7 +27,7 @@ server {
   root /var/www/test-everun;
   index index.html index.htm;
 
-  access_log   /var/log/nginx/stag-everun.access.log   ltsv;
+  access_log   /var/log/nginx/stag-everun.access.log   json;
   error_log    /var/log/nginx/stag-everun.error.log;
 
   http2_max_field_size 256k;

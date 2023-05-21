@@ -27,7 +27,7 @@ server {
   root /var/www/everun;
   index index.html index.htm;
 
-  access_log   /var/log/nginx/everun.access.log   ltsv;
+  access_log   /var/log/nginx/everun.access.log   json;
   error_log    /var/log/nginx/everun.error.log;
 
   http2_max_field_size 256k;
@@ -67,7 +67,7 @@ server {
   # Enable HSTS (HTTP Strict Transport Security)
   add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
-  access_log   /var/log/nginx/everun.access.log   ltsv;
+  access_log   /var/log/nginx/everun.access.log   json;
   error_log    /var/log/nginx/everun.error.log;
 
   http2_max_field_size 256k;
