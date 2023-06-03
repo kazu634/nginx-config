@@ -1,9 +1,11 @@
 # Denies the access without the pre-defined virtual host.
 server {
   listen 80 default_server;
+  listen 443 ssl default_server;
   server_name _;
 
-  location / {
-    return 444;
-  }
+  ssl_certificate /etc/lego/.lego/certificates/_.kazu634.com.crt;
+  ssl_certificate_key /etc/lego/.lego/certificates/_.kazu634.com.key;
+
+  return 444;
 }
