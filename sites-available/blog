@@ -57,6 +57,9 @@ server {
     http2_push https://embedr.flickr.com/assets/client-code.js;
     http2_push https://platform.twitter.com/widgets.js;
 
+    # used to advertise the availability of HTTP/3
+    add_header Alt-Svc 'h3=":443"; ma=86400';
+
     if (-e "/tmp/maintenance") {
       return 503;
     }
