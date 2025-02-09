@@ -1,6 +1,8 @@
 server {
-  # allow access from localhost
-  listen 443 ssl http2;
+  listen 443 quic reuseport;
+  listen 443 ssl;
+  http2 on;
+  http3 on;
   server_name test.kazu634.com;
 
   ssl_certificate /etc/lego/.lego/certificates/_.kazu634.com.crt;
@@ -30,88 +32,12 @@ server {
   access_log   /var/log/nginx/stag.access.log   json;
   error_log    /var/log/nginx/stag.error.log;
 
-  http2_max_field_size 256k;
-  http2_max_header_size 256k;
-
-  location /oauth2/ {
-    proxy_pass       http://127.0.0.1:4180;
-
-    # Configure proxying to auth
-    # proxy_pass_request_body     off;
-    # proxy_set_header            Content-Length "";
-    proxy_set_header            Host                    $host;
-    # proxy_set_header            X-Original-URL          $scheme://$http_host$request_uri;
-    # proxy_set_header            X-Original-Method       $request_method;
-    proxy_set_header            X-Real-IP $remote_addr;
-    proxy_set_header            X-Scheme $scheme;
-    proxy_set_header            X-Auth-Request-Redirect $request_uri;
-    # proxy_http_version          1.1;
-    # proxy_ssl_server_name       on;
-    # proxy_pass_request_headers  on;
-    # client_max_body_size        "1m";
-
-    proxy_buffering on;
-    proxy_buffer_size 256k;
-    proxy_buffers 4 256k;
-    proxy_busy_buffers_size 256k;
-  }
-
-  location = /oauth2/auth {
-    proxy_pass       http://127.0.0.1:4180;
-
-    # Configure proxying to auth
-    proxy_pass_request_body     off;
-    proxy_set_header            Content-Length "";
-    proxy_set_header            Host                    $host;
-    # proxy_set_header            X-Original-URL          $scheme://$http_host$request_uri;
-    # proxy_set_header            X-Original-Method       $request_method;
-    # proxy_set_header            X-Auth-Request-Redirect $request_uri;
-    proxy_set_header            X-Real-IP $remote_addr;
-    proxy_set_header            X-Scheme $scheme;
-    client_max_body_size        "1m";
-
-    proxy_buffering on;
-    proxy_buffer_size 128k;
-    proxy_buffers 4 256k;
-    proxy_busy_buffers_size 256k;
-  }
+  large_client_header_buffers 8 32k;
 
   location / {
-    auth_request /oauth2/auth;
-    error_page 401 = /oauth2/sign_in;
+    auth_basic "限定公開中なのでユーザー名とパスワードを入れてください";
+    auth_basic_user_file "/etc/nginx/basic-auth";
 
     try_files $uri $uri/ /index.html;
-
-    auth_request_set $user $upstream_http_x_auth_request_user;
-    auth_request_set $email $upstream_http_x_auth_request_email;
-    proxy_set_header X-User $user;
-    proxy_set_header X-Email $email;
-
-    # if you enabled --pass-access-token, this will pass the token to the backend
-    auth_request_set $token  $upstream_http_x_auth_request_access_token;
-    proxy_set_header X-Access-Token $token;
-
-    # if you enabled --cookie-refresh, this is needed for it to work with auth_request
-    auth_request_set $auth_cookie $upstream_http_set_cookie;
-    add_header Set-Cookie $auth_cookie;
-
-    # When using the --set-authorization-header flag, some provider's cookies can exceed the 4kb
-    # limit and so the OAuth2 Proxy splits these into multiple parts.
-    # Nginx normally only copies the first `Set-Cookie` header from the auth_request to the response,
-    # so if your cookies are larger than 4kb, you will need to extract additional cookies manually.
-    auth_request_set $auth_cookie_name_upstream_1 $upstream_cookie_auth_cookie_name_1;
-
-    # Extract the Cookie attributes from the first Set-Cookie header and append them
-    # to the second part ($upstream_cookie_* variables only contain the raw cookie content)
-    if ($auth_cookie ~* "(; .*)") {
-        set $auth_cookie_name_0 $auth_cookie;
-        set $auth_cookie_name_1 "auth_cookie_name_1=$auth_cookie_name_upstream_1$1";
-    }
-
-    # Send both Set-Cookie headers now if there was a second part
-    if ($auth_cookie_name_upstream_1) {
-        add_header Set-Cookie $auth_cookie_name_0;
-        add_header Set-Cookie $auth_cookie_name_1;
-    }
   }
 }
