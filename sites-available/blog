@@ -1,7 +1,8 @@
 server {
-  # allow access from localhost
-  listen 443 quic reuseport backlog=1024;
-  listen 443 http2 ssl backlog=1024;
+  listen 443 quic reuseport;
+  listen 443 ssl backlog=1024;
+  http2 on;
+  http3 on;
   server_name blog.kazu634.com;
 
   ssl_certificate /etc/lego/.lego/certificates/_.kazu634.com.crt;
@@ -31,33 +32,10 @@ server {
   access_log   /var/log/nginx/blog.access.log   json;
   error_log    /var/log/nginx/blog.error.log;
 
+  large_client_header_buffers 8 32k;
+
   location / {
-    # http2 server push:
-    http2_push_preload on;
-
-    http2_push /apple-touch-icon.png;
-    http2_push /lib/normalize/normalize.min.css;
-    http2_push /css/style.min.css;
-    http2_push /lib/lightgallery/lightgallery.min.css;
-    http2_push /lib/katex/katex.min.css;
-    http2_push /lib/katex/copy-tex.min.css;
-    http2_push /lib/mapbox-gl/mapbox-gl.min.css;
-    http2_push /lib/smooth-scroll/smooth-scroll.min.js;
-    http2_push /lib/lazysizes/lazysizes.min.js;
-    http2_push /lib/twemoji/twemoji.min.js;
-    http2_push /lib/lightgallery/lightgallery.min.js;
-    http2_push /lib/lightgallery/lg-zoom.min.js;
-    http2_push /lib/clipboard/clipboard.min.js;
-    http2_push /lib/sharer/sharer.min.js;
-    http2_push /lib/katex/katex.min.js;
-    http2_push /lib/katex/auto-render.min.js;
-    http2_push /lib/katex/copy-tex.min.js;
-    http2_push /lib/katex/mhchem.min.js;
-    http2_push /js/theme.min.js;
-    http2_push https://embedr.flickr.com/assets/client-code.js;
-    http2_push https://platform.twitter.com/widgets.js;
-
-    # used to advertise the availability of HTTP/3
+  # used to advertise the availability of HTTP/3
     add_header Alt-Svc 'h3=":443"; ma=86400';
 
     if (-e "/tmp/maintenance") {
